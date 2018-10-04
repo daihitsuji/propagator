@@ -1,7 +1,9 @@
 package isae.supaero.propagator;
 
 import isae.supaero.propagator.model.OrbitSimplified;
+import isae.supaero.propagator.model.PropagationRq;
 import org.hipparchus.util.FastMath;
+import org.omg.PortableInterceptor.ORBIdHelper;
 import org.orekit.data.DataProvidersManager;
 import org.orekit.data.DirectoryCrawler;
 import org.orekit.errors.OrekitException;
@@ -19,6 +21,7 @@ import org.orekit.time.TimeScalesFactory;
 import isae.supaero.propagator.model.OrbitalDataMessage;
 
 import java.io.File;
+import java.util.Date;
 import java.util.Locale;
 
 public class Propagator {
@@ -27,8 +30,12 @@ public class Propagator {
      * @param Orbit
      * */
     KeplerianPropagator kepler;
-
-    public Propagator(OrbitSimplified newOrbit) {
+    OrbitSimplified newOribt;
+    AbsoluteDate absoluteDate;
+    double duration;
+    double stepT;
+    double mu = 3.986004415e+14;
+    public Propagator(PropagationRq orbitRq) {
         try {
 
             File orekitData = new File("orekit-data");
@@ -44,17 +51,28 @@ public class Propagator {
 
             Frame inertialFrame = FramesFactory.getEME2000();
 
-            // Initial date in UTC time scale
-            TimeScale utc = TimeScalesFactory.getUTC();
-            AbsoluteDate initialDate = new AbsoluteDate(2004, 01, 01, 23, 30, 00.000, utc);
+            Date initialDate = orbitRq.getInitialDate();
+            this.newOribt = new OrbitSimplified(orbitRq.getA(), orbitRq.getE(), orbitRq.getI(), orbitRq.getOmega(), orbitRq.getRaan(), orbitRq.getlM0());
+            this.duration = orbitRq.getDuration();
+            this.stepT = orbitRq.getStepT();
 
-            // gravitation coefficient
-            double mu =  3.986004415e+14;
+
+            TimeScale utc = null;
+            try {
+                utc = TimeScalesFactory.getUTC();
+            } catch (OrekitException e) {
+                e.printStackTrace();
+            }
+
+            this.absoluteDate = new AbsoluteDate(initialDate.getYear()+1900, initialDate.getMonth()+1, initialDate.getDay(), initialDate.getHours(),
+                    initialDate.getMinutes(), initialDate.getSeconds(), utc);
+
 
             // Orbit construction as Keplerian
-            Orbit initialOrbit = new KeplerianOrbit(newOrbit.getA(), newOrbit.getE(), newOrbit.getI(),
-                    FastMath.toRadians(newOrbit.getOmega()),  FastMath.toRadians(newOrbit.getRaan()), FastMath.toRadians(newOrbit.getlM0()),
-                    PositionAngle.MEAN, inertialFrame, initialDate, mu);
+            Orbit initialOrbit = new KeplerianOrbit(orbitRq.getA(), orbitRq.getE(), orbitRq.getI(),
+                    FastMath.toRadians(orbitRq.getOmega()),  FastMath.toRadians(orbitRq.getRaan()), FastMath.toRadians(orbitRq.getlM0()),
+                    PositionAngle.MEAN, inertialFrame, absoluteDate, mu);
+
 
             this.kepler = new KeplerianPropagator(initialOrbit);
 
@@ -63,20 +81,12 @@ public class Propagator {
         }
     }
 
-    public OrbitalDataMessage propagate(int epochFrom, int epochTo, int interval ){
+    public OrbitalDataMessage propagate(){
         OrbitalDataMessage resultData = new OrbitalDataMessage();
-        TimeScale utc = null;
-        try {
-            utc = TimeScalesFactory.getUTC();
-        } catch (OrekitException e) {
-            e.printStackTrace();
-        }
-        AbsoluteDate initialDate = new AbsoluteDate(2004, 01, 01, 23, 30, 00.000, utc);
-        double duration = 600.;
-        AbsoluteDate finalDate = initialDate.shiftedBy(duration);
-        double stepT = 60.;
-        int cpt = 1;
-        for (AbsoluteDate extrapDate = initialDate;
+
+
+        AbsoluteDate finalDate = absoluteDate.shiftedBy(duration);
+        for (AbsoluteDate extrapDate = absoluteDate;
              extrapDate.compareTo(finalDate) <= 0;
              extrapDate = extrapDate.shiftedBy(stepT))  {
             SpacecraftState currentState = null;

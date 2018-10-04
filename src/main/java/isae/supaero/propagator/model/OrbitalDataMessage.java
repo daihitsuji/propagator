@@ -9,28 +9,28 @@ import java.util.Map;
 
 public class OrbitalDataMessage {
 
-    Map<String, OrbitSimplified> OrbitalPosToEpoch;
+    Map<String, OrbitSimplified> Ephemerids;
 
     public OrbitalDataMessage() {
-        OrbitalPosToEpoch = new HashMap<String, OrbitSimplified>();
+        Ephemerids = new HashMap<String, OrbitSimplified>();
     }
 
     public void addBodyState(String date, OrbitSimplified orbit){
-        OrbitalPosToEpoch.put(date,orbit);
+        Ephemerids.put(date,orbit);
     }
 
     public Map<String, OrbitSimplified> getOrbitalPosToEpoch() {
-        return OrbitalPosToEpoch;
+        return Ephemerids;
     }
 
     public void setOrbitalPosToEpoch(Map<String, OrbitSimplified> orbitalPosToEpoch) {
-        OrbitalPosToEpoch = orbitalPosToEpoch;
+        Ephemerids = orbitalPosToEpoch;
     }
 
     @Override
     public String toString() {
         return "OrbitalDataMessage{" +
-                "OrbitalPosToEpoch=" + OrbitalPosToEpoch +
+                "OrbitalPosToEpoch=" + Ephemerids +
                 '}';
     }
 }
