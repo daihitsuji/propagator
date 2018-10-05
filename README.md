@@ -1,7 +1,7 @@
 # Propagator
 - Propagator quick sample using Spring boot and orekit.
 - Serveur is running on the port 8080. Request can be send via postman or curl.
-- User interface is also available see UI section
+- User interface is also available on port 8888 if you follow the front end section
 - Note that I didn't check coherency of returns value generated. Some bugs may have to be fixed ! :)
 
 /Propagation -- Post request
