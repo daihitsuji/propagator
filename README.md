@@ -44,5 +44,3 @@ java -jar target/propagator-0.0.1-SNAPSHOT.jar
     npm install
     npm run serve
 ```
-
-- A bug is still remaining on the user interface. Date has to be change before each propagation ... sorry :(

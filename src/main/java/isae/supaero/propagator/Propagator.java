@@ -35,9 +35,12 @@ public class Propagator {
     double duration;
     double stepT;
     double mu = 3.986004415e+14;
+    long loadingFileTime;
+    long calculationTime;
+
     public Propagator(PropagationRq orbitRq) {
         try {
-
+            this.loadingFileTime = System.nanoTime();
             File orekitData = new File("orekit-data");
             if (!orekitData.exists()) {
                 System.err.format(Locale.US, "Failed to find %s folder%n",
@@ -46,12 +49,20 @@ public class Propagator {
                         "orekit-data.zip", "https://www.orekit.org/forge/projects/orekit/files");
                 System.exit(1);
             }
+
+
             DataProvidersManager manager = DataProvidersManager.getInstance();
             manager.addProvider(new DirectoryCrawler(orekitData));
 
             Frame inertialFrame = FramesFactory.getEME2000();
 
+            this.loadingFileTime = System.nanoTime() - this.loadingFileTime;
+
+            this.calculationTime = System.nanoTime();
+
             Date initialDate = orbitRq.getInitialDate();
+            System.out.println(initialDate.getYear()+1900 +"-"+initialDate.getMonth()+1+"-"+initialDate.getDay()+" "+initialDate.getHours()+"-"+
+                    initialDate.getMinutes()+"-"+initialDate.getSeconds());
             this.newOribt = new OrbitSimplified(orbitRq.getA(), orbitRq.getE(), orbitRq.getI(), orbitRq.getOmega(), orbitRq.getRaan(), orbitRq.getlM0());
             this.duration = orbitRq.getDuration();
             this.stepT = orbitRq.getStepT();
@@ -64,7 +75,7 @@ public class Propagator {
                 e.printStackTrace();
             }
 
-            this.absoluteDate = new AbsoluteDate(initialDate.getYear()+1900, initialDate.getMonth()+1, initialDate.getDay(), initialDate.getHours(),
+            this.absoluteDate = new AbsoluteDate(initialDate.getYear()+1900, initialDate.getMonth()+1, initialDate.getDate(), initialDate.getHours(),
                     initialDate.getMinutes(), initialDate.getSeconds(), utc);
 
 
@@ -75,6 +86,8 @@ public class Propagator {
 
 
             this.kepler = new KeplerianPropagator(initialOrbit);
+
+
 
         } catch (OrekitException e) {
             e.printStackTrace();
@@ -103,7 +116,10 @@ public class Propagator {
             }
 
         }
-
+        this.calculationTime = System.nanoTime() - this.calculationTime;
+        System.out.println("Total time : " + (this.calculationTime + this.loadingFileTime)/1000000 + " ms");
+        System.out.println("Loading file time : " + this.loadingFileTime / 1000000 + " ms");
+        System.out.println("Calculation time : " + this.calculationTime/ 1000000 + " ms")    ;
         return resultData;
     }
 

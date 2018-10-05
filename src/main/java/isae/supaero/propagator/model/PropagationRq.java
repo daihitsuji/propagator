@@ -11,6 +11,10 @@ public class PropagationRq extends OrbitSimplified {
 
     public PropagationRq(double a, double e, double i, double omega, double raan, double lM0, String initialDate, double duration, double stepT) {
         super(a, e, i, omega, raan, lM0);
+        //2004-01-22T22:32:00.000Z
+        //2004-01-25T22:32:00.000Z
+        //2004-01-21T22:32:00.000Z
+        System.out.println(initialDate);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
         try {
