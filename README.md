@@ -1,10 +1,13 @@
-# propagator
-REST - Propagator quick sample using Spring boot and orekit
+# Propagator
+- Propagator quick sample using Spring boot and orekit.
+- Serveur is running on the port 8080. Request can be send via postman or curl.
+- User interface is also available see UI section
+- Note that I didn't check coherency of returns value generated. Some bugs may have to be fixed ! :)
 
 /Propagation -- Post request
 ```
 {
-    "initialDate": "2004-01-01T23:30:00.000",
+    "initialDate": "2004-01-25T22:32:00.000Z",
     "duration": 1200 ,
     "stepT": 60,
     "a": 24396159,
@@ -28,6 +31,18 @@ Where :
 
 # Launch the server
 
+## Backend
+
 ```
 java -jar target/propagator-0.0.1-SNAPSHOT.jar
 ```
+
+## Front end 
+- npm and nodejs have to be installed
+
+``` cd ui
+    npm install
+    npm run serve
+```
+
+- A bug is still remaining on the user interface. Date has to be change before each propagation ... sorry :(
